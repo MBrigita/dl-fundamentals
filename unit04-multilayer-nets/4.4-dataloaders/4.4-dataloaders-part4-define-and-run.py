@@ -14,24 +14,24 @@ class MyDataset(Dataset):
     def __init__(self, csv_path, img_dir, transform=None):
 
         df = pd.read_csv(csv_path)
-        self.img_dir = img_dir
-        self.transform = transform
+        self.img_dir = img_dir # definig image folder
+        self.transform = transform # calling data tranformation
 
-        # based on DataFrame columns
+        # based on DataFrame columns - save atributtes
         self.img_names = df["filepath"]
         self.labels = df["label"]
 
     def __getitem__(self, index):
-        img = Image.open(os.path.join(self.img_dir, self.img_names[index]))
+        img = Image.open(os.path.join(self.img_dir, self.img_names[index])) #defiining how we are loading image, gets the file path based on self.img_dir, and image name from filepath
 
         if self.transform is not None:
             img = self.transform(img)
 
         label = self.labels[index]
-        return img, label
+        return img, label #returns the training pair
 
     def __len__(self):
-        return self.labels.shape[0]
+        return self.labels.shape[0] #returns total lenght
 
 
 def viz_batch_images(batch):
@@ -47,7 +47,7 @@ def viz_batch_images(batch):
     plt.show()
 
 
-if __name__ == "__main__":
+if __name__ == "__main__": #this willbe the main process - if we run from th ecommand line, and we put all the code we want to execute
 
     print(watermark(packages="torch", python=True))
 
@@ -64,7 +64,7 @@ if __name__ == "__main__":
         "test": transforms.Compose(
             [
                 transforms.Resize(32),
-                transforms.CenterCrop((28, 28)),
+                transforms.CenterCrop((28, 28)), #for test NO RANDOM, we do not want randomness
                 transforms.ToTensor(),
                 # normalize images to [-1, 1] range
                 transforms.Normalize((0.5,), (0.5,)),
@@ -73,16 +73,16 @@ if __name__ == "__main__":
     }
 
     train_dataset = MyDataset(
-        csv_path="mnist-pngs/new_train.csv",
+        csv_path="mnist-pngs/new_train.csv", # we difined this in the precious 
         img_dir="mnist-pngs/",
         transform=data_transforms["train"],
     )
 
-    train_loader = DataLoader(
+    train_loader = DataLoader( #we use for out dataset defined above
         dataset=train_dataset,
         batch_size=32,
         shuffle=True,  # want to shuffle the dataset
-        num_workers=2,  # number processes/CPUs to use
+        num_workers=2,  # number processes/CPUs to use -number of parallel processes
     )
 
     val_dataset = MyDataset(
